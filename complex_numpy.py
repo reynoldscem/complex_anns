@@ -17,30 +17,33 @@ class ComplexANN():
         self.hidden_size = hidden_size
         self.output_size = output_size
 
-        self.parameters = []
-        self.parameters.append(
-            self.complex_init(input_size, hidden_size)
-        )
-
-        for _ in range(2, self.n_hidden):
-            self.parameters.append(
-                self.complex_init(hidden_size, hidden_size)
-            )
-
-        self.parameters.append(
-            self.complex_init(hidden_size, output_size)
-        )
+        self.setup_parameters()
 
         self.gradient_function = None
         self.lr = None
 
+    def setup_parameters(self):
+        self.parameters = []
+        self.parameters.append(
+            self.complex_init(self.input_size, self.hidden_size)
+        )
+
+        for _ in range(2, self.n_hidden):
+            self.parameters.append(
+                self.complex_init(self.hidden_size, self.hidden_size)
+            )
+
+        self.parameters.append(
+            self.complex_init(self.hidden_size, self.output_size)
+        )
+
     @classmethod
     def complex_init(cls, incoming, outgoing):
-        # Similar to glorot initialisation.
-        real_rand = (np.random.randn(incoming, outgoing) - 0.5)
-        real_rand = real_rand * 1 / (incoming + outgoing)
-        imag_rand = (np.random.randn(incoming, outgoing) - 0.5)
-        imag_rand = imag_rand * 1 / (incoming + outgoing)
+        # Glorot initialisation.
+        real_rand = np.random.randn(incoming, outgoing)
+        real_rand = real_rand * 2 / (incoming + outgoing)
+        imag_rand = np.random.randn(incoming, outgoing)
+        imag_rand = imag_rand * 2 / (incoming + outgoing)
 
         bias = np.zeros(outgoing) + 1j * np.zeros(outgoing)
 
